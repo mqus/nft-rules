@@ -1,0 +1,64 @@
+# SSDP Server Configuration
+
+Author: mqus
+
+## EDIT: THIS CONFIG IS WRONG, DON'T USE IT!
+### I let it stay here to maybe reintroduce it if i was possibly right. 
+
+
+SSDP is a multicast protocol for discovering devices in your local network.
+This snippet focuses on discoverable devices.
+As the protocol is a bit unusual, it needs some special rules to open the firewall a bit if needed.
+
+Its assumed that a rule accepting packages with the right conntrack is already established 
+(as written in the config file below)
+
+This configuration will detect and accept any received discovery packets 
+(which will be sent to 239.255.255.250:1900 or other addresses for ipv6) 
+and remembers the sender ip/port pair in `ssdp_in` to allow all new connections from this peer for five seconds.
+
+Configuration file (e.g. `/etc/nftables.conf`):
+```
+table inet filter{
+
+	set ssdp_in {
+		type ipv4_addr . inet_service;
+		timeout 5s
+	}
+	set ssdp_in_ip6 {
+		type ipv6_addr . inet_service;
+		timeout 5s
+	}
+
+	chain input {
+		[...]
+		# allow established/related connections
+		ct state {established, related} accept
+
+		# allow senders of ssdp requests on any incoming port.
+		ip saddr . udp sport @ssdp_in set accept
+		ip6 saddr . udp sport @ssdp_in_ip6 set accept
+		
+		# remember senders of ssdp multicast requests and accept the requests.
+		ip daddr 239.255.255.250 udp dport 1900 set add ip saddr . udp sport @ssdp_in accept
+		ip6 daddr {FF02::C, FF05::C, FF08::C, FF0E::C} udp dport 1900 set add ip6 saddr . udp sport @ssdp_in_ip6 accept
+		
+
+	}
+	[...]
+}
+
+```
+`nft`-commands that will do the same:
+
+```
+# Setup sets for remembering ip/port pairs
+nft add set filter ssdp_in {type ipv4_addr . inet_service\; timeout 5s \;}
+nft add set filter ssdp_in_ip6 {type ipv6_addr . inet_service\; timeout 5s \;}
+# Setup rules to accept connections from those ip/port pairs
+nft add rule filter input ip saddr . udp sport @ssdp_in set accept
+nft add rule filter input ip6 saddr . udp sport @ssdp_in_ip6 set accept
+# create rules to add ip/port pairs if a ssdp-multicast was detected.
+nft add rule filter input ip daddr 239.255.255.250 udp dport 1900 set add ip saddr . udp sport @ssdp_in accept
+nft add rule filter input ip6 daddr {FF02::C, FF05::C, FF08::C, FF0E::C} udp dport 1900 set add ip6 saddr . udp sport @ssdp_in_ip6 accept
+```
