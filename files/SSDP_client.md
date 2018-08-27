@@ -39,11 +39,7 @@ table inet filter{
 		
 
 	}
-	
-	chain forward {
-		[...]
-	}
-	
+
 	chain output {
 		[...]
 		# Remember port of outgoing SSDP message
@@ -59,10 +55,13 @@ table inet filter{
 ```
 # Create a set for remembering the port on which ssdp replies will be received
 nft add set filter ssdp_out {type inet_service \; timeout 5s \;}
+
 # Create a rule for adding the ports to the set
-nft add rule filter output ip daddr 239.255.255.250 udp dport 1900 set add udp sport @ssdp_out 
+nft add rule filter output ip daddr 239.255.255.250 udp dport 1900 set add udp sport @ssdp_out
+
 # The same for ipv6
 nft add rule filter output ip6 daddr {FF02::C, FF05::C, FF08::C, FF0E::C} udp dport 1900 set add udp sport @ssdp_out
+
 # Create a rule for accepting any ssdp packets going to a remembered port.
 nft add rule filter input udp sport 1900 udp dport @ssdp_out accept
 ```

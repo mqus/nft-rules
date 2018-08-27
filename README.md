@@ -1,8 +1,12 @@
 # nft-rules
 A Collection of useful nftables rules for all applications (From simple 'open port x' over vpn with NAT to ssdp/upnp)
 
+**WARNING: The authors are not responsible for the security of your network. 
+Please do use the examples provided here with care and try to understand the examples before copying it into your configuration.**
+
 All examples and documentation shown here are licensed under the Creative Commons Attribution 4.0 International License (CC-BY-4.0).
 
+All Snippets assume a simple stateful firewall including a filter table, an input and output chain. Some info to achieving this is [here](https://wiki.archlinux.org/index.php/Nftables#Simple_IPv4.2FIPv6_firewall)
 If a snippet doesn't work for you, file an issue and we'll try to help you and maybe improve the snippet in the process.
 
 ## Contribute
@@ -20,4 +24,4 @@ If you want to contribute, please read [this](CONTRIBUTING.md)
 
 ## Links
 
-[The official Wiki](https://wiki.nftables.org/wiki-nftables/index.php/Main_Page)
+[The official nftables Wiki](https://wiki.nftables.org)
