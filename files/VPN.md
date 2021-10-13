@@ -88,7 +88,7 @@ nft add rule filter input $tcp/udp$ dport $vpn_port$ accept
 # nft add rule filter input udp dport 1194 accept
 
 # add packet forwarding
-nft add chain inet filter forward { type filter hook forward priority 0 \; policy drop}
+nft add chain inet filter forward { type filter hook forward priority 0 \; policy drop \;}
 nft add rule filter forward ct state related,established accept
 nft add rule filter forward iifname $vpn_if$ oifname $outside_if$ accept
 
