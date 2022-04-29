@@ -41,7 +41,7 @@ table inet filter{
 	
 	chain forward {
 		#Drop forwarded packets if they are not matched
-		type filter hook forward priority 0 policy drop;
+		type filter hook forward priority 0; policy drop;
 
 		# allow existing connections 
 		ct state related,established accept
@@ -63,7 +63,7 @@ table ip nat {
 		type nat hook postrouting priority 100;
 	
 		# enable NAT for VPN
-		ifname $vpn_if$ oifname $outside_if$ ip saddr $vpn_subnet$ masquerade
+		iifname $vpn_if$ oifname $outside_if$ ip saddr $vpn_subnet$ masquerade
 	
 	}
 	
